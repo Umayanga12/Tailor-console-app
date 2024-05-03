@@ -1,45 +1,40 @@
 #include<iostream>
-#include<map>
-#include<vector>
-
-#define MAX_SIZE 100
+#include<stdlib.h>
 
 using namespace std;
 
-typedef struct{
+typedef struct Task {
+    string task;
+    struct Task* nextTaskNo;
+} Task;
 
-}ClassificationTree;
-
-//creating data structure 
 typedef struct{
-    string task[MAX_SIZE];
-    int top;
+    Task* top;
 }TaskStack;
 
-//Initilize the task stack
 void InitilizeTaskStack(TaskStack *stack){
-    stack->top = -1;
+    stack->top = NULL;
 }
 
-//Add task to the stack
-bool AddTask(TaskStack* stackTask, string task){
-    if (stackTask->top == MAX_SIZE - 1)
+void AddTask(TaskStack* TaskList, string addedTask){
+    Task* newTask = (Task*)malloc(sizeof(Task));
+    newTask ->task = addedTask;
+    newTask ->nextTaskNo = TaskList -> top;
+    TaskList ->top = newTask;
+}
+
+
+string RetrieveTask(TaskStack *TaskList){
+    if (TaskList ->top == NULL)
     {
-        cout<<"Task Stack is Full"<<endl;
-        return;
-    }
-    stackTask->task[++stackTask->top] = task;
-    return true;
-}
-
-//Rectrieve the task from stack
-string RetrieveTask(TaskStack *Task){
-    if (Task->top == -1)
-    {   
-        cout<<"DOn't have any Task"<<endl;
+        cout<<"Task list is empty"<<endl;
         exit(EXIT_FAILURE);
     }
-    return Task->task[Task->top];
+    string task = TaskList->top->task;
+    Task* rec_task = TaskList -> top;
+    TaskList->top = TaskList->top->nextTaskNo;
+    free(rec_task);
+    return task;
 }
 
 int main(){
