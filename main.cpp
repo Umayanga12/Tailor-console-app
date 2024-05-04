@@ -37,6 +37,29 @@ string RetrieveTask(TaskStack *TaskList){
     return task;
 }
 
+typedef struct ClassificationTree {
+    TaskStack TaskList;
+    struct TreeBranch* Important;
+    union CriticalTree
+    {
+        TaskStack TaskList;
+        struct TreeBranch* Tree;
+    };
+    
+    struct TreeBranch* Normal;
+} ClassificationTree;
+
+typedef struct treenode
+{   struct treenode* leftbranch;
+    struct treenode* rightbranch; 
+}treenode;
+
+ClassificationTree* createtree(string data){
+    ClassificationTree* newTree = (ClassificationTree*)malloc(sizeof(treenode));
+    newTree -> Normal = NULL;
+    
+}
+
 int main(){
 
 }
