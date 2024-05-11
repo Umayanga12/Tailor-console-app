@@ -1,28 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include<unistd.h>
+#include<time.h>
+#include<pthread.h>
+#include<math.h>
 
-// Define structures
-// Stack node
+char *TaskType[] = {"Normal", "Critical", "Significant"};
+const int NumTaskTypes = sizeof(TaskType) / sizeof(TaskType[0]);
+pthread_t thread_eProductionLine;
+pthread_t thread_productionLine;
+pthread_t thread_deliveryLine;
+
 typedef struct StackNode {
     void *data;  
     struct StackNode *next;  
 } StackNode;
 
-// Stack structure
 typedef struct Stack {
     StackNode *top;  
 } Stack;
 
-// Tree node
 typedef struct TreeNode {
-    char *name;  // Name of the node
-    Stack *stack;  // Pointer to the stack associated with the node
-    struct TreeNode **children;  // Array of pointers to child nodes
-    int num_children;  // Number of children
+    char *name;  
+    Stack *stack;  
+    struct TreeNode **children;  
+    int num_children;  
 } TreeNode;
 
-// Function to initialize a stack
 Stack* createStack() {
     Stack *stack = (Stack*)malloc(sizeof(Stack));
     if (stack == NULL) {
@@ -33,7 +38,6 @@ Stack* createStack() {
     return stack;
 }
 
-// Function to push an item onto the stack
 void push(Stack *stack, void *data) {
     StackNode *newNode = (StackNode*)malloc(sizeof(StackNode));
     if (newNode == NULL) {
@@ -45,10 +49,9 @@ void push(Stack *stack, void *data) {
     stack->top = newNode;
 }
 
-// Function to pop an item from the stack
 void* pop(Stack *stack) {
     if (stack->top == NULL) {
-        return NULL;  // Stack is empty
+        return NULL;
     }
     StackNode *temp = stack->top;
     void *data = temp->data;
@@ -65,21 +68,19 @@ void printStack(Stack *stack) {
     }
 }
 
-// Function to create a tree node
 TreeNode* createTreeNode(char *name) {
     TreeNode *node = (TreeNode*)malloc(sizeof(TreeNode));
     if (node == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    node->name = strdup(name);  // Duplicate the name string
+    node->name = strdup(name);  
     node->stack = createStack();
     node->children = NULL;
     node->num_children = 0;
     return node;
 }
 
-// Function to add a child node to a parent node
 void addChild(TreeNode *parent, TreeNode *child) {
     parent->num_children++;
     parent->children = (TreeNode**)realloc(parent->children, parent->num_children * sizeof(TreeNode*));
@@ -90,7 +91,6 @@ void addChild(TreeNode *parent, TreeNode *child) {
     parent->children[parent->num_children - 1] = child;
 }
 
-// Function to create the sample structure
 TreeNode* createStructure() {
     TreeNode *root = createTreeNode("Root");
     TreeNode *important = createTreeNode("Important");
@@ -106,6 +106,7 @@ TreeNode* createStructure() {
     return root;
 }
 
+
 int main() {
     // Create the sample structure
     TreeNode *root = createStructure();
@@ -113,20 +114,46 @@ int main() {
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    // Example usage: Pushing and popping items onto/from the stack of a node
-    // char *data1 = "Key1: Value1";
-    // push(root->stack, data1);
-    // char *data2 = "Key2: Value2";
-    // push(root->stack, data2);
-
-    // void *popped_data = pop(root->stack);
-    // if (popped_data != NULL) {
-    //     printf("Popped data: %s\n", (char*)popped_data);
-    //     free(popped_data);
-    // }
-
-    printf("Enter the number \n 1 - to push data \n 2 - to pop data \n 3 - to exit \n");
-
+    
+    printf("Enter \n 1 - Add Task \n 2 - Rectrive Task \n 3 - Rectrive all Task \n 4 - Exit\n");
+    int choice;
+    scanf("%d", &choice);
+    while(choice != 4){
+        if(choice == 1){
+            printf("Enter Task Type\n 1 - Normal\n 2 - Critical\n 3 - Significant\n");
+            int taskType;
+            scanf("%d", &taskType);
+            printf("Enter Task Name\n");
+            char taskName[100];
+            scanf("%s", taskName);
+            char *data = (char*)malloc(sizeof(char) * 100);
+            strcpy(data, taskName);
+            push(root->stack, data);
+        }else if(choice == 2){
+            printf("Enter Task Type\n 1 - Normal\n 2 - Critical\n 3 - Significant\n");
+            int taskType;
+            scanf("%d", &taskType);
+            printf("Enter Task Name\n");
+            char taskName[100];
+            scanf("%s", taskName);
+            StackNode *current = root->stack->top;
+            while (current != NULL) {
+                if(strcmp((char*)current->data, taskName) == 0){
+                    printf("Task Found\n");
+                    break;
+                }
+                current = current->next;
+            }
+            if(current == NULL){
+                printf("Task Not Found\n");
+            }
+        }else if(choice == 3){
+            printStack(root->stack);
+        }
+        printf("Enter \n 1 - Add Task \n 2 - Rectrive Task \n 3 - Rectrive all Task \n 4 - Exit\n");
+        scanf("%d", &choice);
+    }
+    
     // Clean up: Free memory
     free(root->name);
     free(root->stack);
