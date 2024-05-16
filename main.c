@@ -1,16 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<unistd.h>
 #include<time.h>
-#include<pthread.h>
 #include<math.h>
-
-char *TaskType[] = {"Normal", "Critical", "Significant"};
-const int NumTaskTypes = sizeof(TaskType) / sizeof(TaskType[0]);
-pthread_t thread_eProductionLine;
-pthread_t thread_productionLine;
-pthread_t thread_deliveryLine;
 
 typedef struct StackNode {
     void *data;  
